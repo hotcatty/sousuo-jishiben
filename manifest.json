@@ -1,0 +1,70 @@
+{
+  "manifest_version": 3,
+  "name": "搜搜记事本",
+  "short_name": "搜搜记事本",
+  "version": "1.31.0",
+  "description": "小红书搜索记事本：带着目的搜，贴有用的，跑偏了再拉回来",
+  "permissions": [
+    "storage",
+    "alarms",
+    "tabs",
+    "cookies",
+    "notifications",
+    "sidePanel",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "https://*.bilibili.com/*",
+    "https://*.xiaohongshu.com/*",
+    "https://*.xhscdn.com/*",
+    "https://*.douyin.com/*",
+    "https://api.deepseek.com/*",
+    "https://api.openai.com/*",
+    "https://tokenhub.tencentmaas.com/*",
+    "https://*.tencentmaas.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background/index.js"
+  },
+  "side_panel": {
+    "default_path": "src/pages/sidepanel.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.bilibili.com/*"],
+      "js": ["src/content/bilibili.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://www.xiaohongshu.com/*"],
+      "js": ["src/content/xhs-ui.js", "src/content/xiaohongshu.js"],
+      "run_at": "document_start"
+    },
+    {
+      "matches": ["https://www.douyin.com/*"],
+      "js": ["src/content/douyin.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_title": "打开搜搜记事本",
+    "default_icon": {
+      "16": "assets/icons/icon16.png",
+      "32": "assets/icons/icon32.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "assets/icons/icon16.png",
+    "32": "assets/icons/icon32.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["src/pages/*", "assets/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

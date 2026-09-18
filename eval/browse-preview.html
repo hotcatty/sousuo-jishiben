@@ -1,0 +1,82 @@
+<!doctype html>
+<!-- 浏览页场景核对：闸门分裂 / 专注卡 / 猜测无关 / 收集胶囊。不随插件打包 -->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>浏览页场景 · 实现预览</title>
+<link rel="stylesheet" href="../src/pages/theme.css" />
+<style>
+  html, body { margin: 0; height: 100%; font-family: -apple-system, "PingFang SC", sans-serif; background: #111; }
+  .nav { position: fixed; left: 0; top: 0; bottom: 0; width: 167px; border-right: 1px solid #f0f0f0; padding: 20px 16px; box-sizing: border-box; background: #fff; z-index: 2; }
+  .logo { width: 62px; height: 26px; border-radius: 6px; background: #ff2442; margin-bottom: 24px; }
+  .nav i { display: block; height: 22px; margin: 18px 0; border-radius: 6px; background: #eee; }
+  .note-detail-mask { position: fixed; left: 167px; right: 0; top: 0; bottom: 0; background: #1a1a1a; }
+  .note-container { display: flex; height: 100%; }
+  .media-container { flex: 1; min-width: 0; background: linear-gradient(180deg, #c8e0c0, #e8d9a8); }
+  .interaction-container { position: relative; width: 360px; flex: none; background: #fff; display: flex; flex-direction: column; }
+  .interaction-container h1 { font-size: 18px; margin: 20px 20px 8px; }
+  .interaction-container .meta { padding: 0 20px; color: #888; font-size: 13px; }
+  .interaction-container p { font-size: 14px; line-height: 1.7; color: #333; padding: 0 20px; }
+  .sel { background: rgba(255, 220, 80, 0.45); }
+  .engage-bar { margin-top: auto; height: 56px; display: flex; align-items: center; gap: 12px; padding: 0 16px; border-top: 1px solid #f0f0f0; }
+  .engage-bar input { flex: 1; height: 36px; border: 0; background: #f5f5f5; border-radius: 18px; padding: 0 14px; }
+  .engage-bar b { flex: none; font-size: 12px; color: #666; font-weight: 400; }
+  #M { position: fixed; left: 8px; bottom: 8px; margin: 0; font-size: 10px; color: #666; background: #fff; padding: 6px 8px; border-radius: 8px; z-index: 9; }
+</style>
+</head>
+<body>
+  <div class="nav"><div class="logo"></div><i></i><i></i><i></i><i></i><i></i></div>
+  <div class="note-detail-mask">
+    <div class="note-container">
+      <div class="media-container" id="fake-pic"></div>
+      <div class="interaction-container">
+        <h1>广州可以分成 3 个板块游玩</h1>
+        <div class="meta">Harriet · 共 187 条评论</div>
+        <p>8-9 月计划来广州旅游的姐妹注意！<span class="sel" id="sel-sample">里面有路线安排、出行交通、美食等等</span>。分享出来给大家哦。</p>
+        <div class="engage-bar">
+          <input placeholder="说点什么..." />
+          <b>♡ 701</b><b>☆ 721</b><b>187</b>
+        </div>
+      </div>
+    </div>
+  </div>
+<script>
+  window.chrome = { runtime: { getURL: (p) => '../' + p, sendMessage: () => {} } };
+</script>
+<script src="../src/content/xhs-ui.js"></script>
+<script>
+  const state = new URLSearchParams(location.search).get('state') || 'gate';
+  const ui = window.__fgUI;
+  if (state === 'gate' || state === 'filled') {
+    ui.showGate({
+      defaultKeyword: state === 'filled' ? '广州三日游' : '',
+      onSearch: (kw) => console.log('search', kw),
+      onBrowse: (kw) => console.log('browse', kw)
+    });
+    document.getElementById('fg-xhs-gate').classList.add('on');
+  } else if (state === 'focus') {
+    ui.showFocusCard({
+      intent: '广州三日游',
+      keywords: ['广州三日游 出行交通', '广州美食', '广州塔门票', '广州博物馆预约', '广州历史'],
+      onContinue: () => console.log('continue'),
+      onKeyword: (k) => console.log('kw', k)
+    });
+  } else if (state === 'guess') {
+    ui.showDrift({
+      onBack: () => console.log('back'),
+      onCorrect: () => console.log('related')
+    });
+  } else if (state === 'collect') {
+    ui.showSaveNote(() => console.log('save note'));
+  } else if (state === 'toast') {
+    ui.showToast('切换到首页、RED、直播会被拦截');
+  } else if (state === 'diandian') {
+    ui.showDiandianChip(() => console.log('diandian'));
+  }
+  const pre = document.createElement('pre');
+  pre.id = 'M';
+  pre.textContent = 'state=' + state;
+  document.body.appendChild(pre);
+</script>
+</body>
+</html>

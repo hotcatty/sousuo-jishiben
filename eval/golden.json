@@ -1,0 +1,121 @@
+[
+  {
+    "id": "home-good-list",
+    "intent": "独居家居购买",
+    "note_title": "一人居：小户型家具清单和避雷",
+    "note_topics": ["家居", "独居", "好物分享"],
+    "expected": "on_goal"
+  },
+  {
+    "id": "home-good-scene",
+    "intent": "独居家居购买",
+    "note_title": "出租屋改造：一人食餐桌椅怎么选",
+    "note_topics": ["改造", "餐桌"],
+    "expected": "on_goal"
+  },
+  {
+    "id": "home-good-ikea",
+    "intent": "独居家居购买",
+    "note_title": "宜家穆利格沙发真实尺寸",
+    "note_topics": ["宜家", "沙发"],
+    "expected": "on_goal"
+  },
+  {
+    "id": "home-good-share",
+    "intent": "独居家居购买",
+    "note_title": "别人的客厅好物分享｜出租屋也能住成家",
+    "note_topics": ["好物分享", "客厅"],
+    "expected": "on_goal"
+  },
+  {
+    "id": "home-drift-beauty",
+    "intent": "独居家居购买",
+    "note_title": "今日份美女写真｜氛围感拉满",
+    "note_topics": ["美女", "写真"],
+    "expected": "drifting"
+  },
+  {
+    "id": "home-drift-gossip",
+    "intent": "独居家居购买",
+    "note_title": "最新娱圈恋情瓜",
+    "note_topics": ["八卦", "明星"],
+    "expected": "drifting"
+  },
+  {
+    "id": "home-drift-makeup",
+    "intent": "独居家居购买",
+    "note_title": "10分钟出门妆 学生党美妆",
+    "note_topics": ["美妆"],
+    "expected": "drifting"
+  },
+  {
+    "id": "home-unknown-empty",
+    "intent": "独居家居购买",
+    "note_title": "",
+    "note_topics": [],
+    "expected": "unknown"
+  },
+  {
+    "id": "home-unknown-vague",
+    "intent": "独居家居购买",
+    "note_title": "周一随笔",
+    "note_topics": [],
+    "expected": "unknown"
+  },
+  {
+    "id": "storage-good",
+    "intent": "北欧风小户型收纳",
+    "note_title": "4平米玄关收纳柜实测",
+    "note_topics": ["收纳", "小户型"],
+    "expected": "on_goal"
+  },
+  {
+    "id": "study-good",
+    "intent": "考研英语单词",
+    "note_title": "考研英语高频单词记忆法",
+    "note_topics": ["考研", "英语"],
+    "expected": "on_goal"
+  },
+  {
+    "id": "study-drift",
+    "intent": "考研英语单词",
+    "note_title": "王者荣耀这波操作太秀了",
+    "note_topics": ["游戏", "王者荣耀"],
+    "expected": "drifting"
+  },
+  {
+    "id": "diet-good",
+    "intent": "减脂餐一周食谱",
+    "note_title": "减脂便当：鸡胸肉西兰花一周不重样",
+    "note_topics": ["减脂", "便当"],
+    "expected": "on_goal"
+  },
+  {
+    "id": "diet-drift",
+    "intent": "减脂餐一周食谱",
+    "note_title": "重庆火锅探店吃播",
+    "note_topics": ["吃播", "探店"],
+    "expected": "drifting"
+  },
+  {
+    "id": "mac-good",
+    "intent": "MacBook 选购",
+    "note_title": "M4 Air vs Pro 学生党怎么选",
+    "note_topics": ["MacBook", "数码"],
+    "expected": "on_goal"
+  },
+  {
+    "id": "mac-drift",
+    "intent": "MacBook 选购",
+    "note_title": "演唱会追星穿搭分享",
+    "note_topics": ["追星", "穿搭"],
+    "expected": "drifting"
+  },
+  {
+    "id": "skin-unknown",
+    "intent": "护肤成分分析",
+    "note_title": "...",
+    "note_topics": [],
+    "expected": "unknown"
+  }
+]

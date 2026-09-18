@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B站净化模式 — Focus Guard</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --border: #f0f0f0;
+    --text: #191919;
+    --sub: #999;
+    --bg: #f6f6f6;
+    --card: #fff;
+    --accent: #00a1d6;
+    --radius: 10px;
+  }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Helvetica Neue', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ---- Header ---- */
+  header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 56px;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .logo { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+  .logo-badge {
+    font-size: 10px; background: var(--accent); color: #fff;
+    padding: 2px 7px; border-radius: 4px; font-weight: 600; letter-spacing: 0.3px;
+  }
+  .header-right { display: flex; align-items: center; gap: 12px; }
+  .timer {
+    font-size: 13px; color: var(--sub);
+    font-variant-numeric: tabular-nums; font-family: 'SF Mono', 'Menlo', monospace;
+  }
+  .btn-link {
+    font-size: 13px; color: var(--accent); cursor: pointer;
+    background: none; border: none; padding: 0; font-family: inherit;
+  }
+  .btn-link:hover { text-decoration: underline; }
+
+  /* ---- Tabs ---- */
+  .tabs {
+    background: var(--card); border-bottom: 1px solid var(--border);
+    padding: 0 40px; display: flex; gap: 0;
+  }
+  .tab {
+    padding: 14px 20px; cursor: pointer;
+    font-size: 14px; font-weight: 500; color: var(--sub);
+    border: none; background: none; border-bottom: 2px solid transparent;
+    transition: all 0.15s; margin-bottom: -1px;
+  }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  /* ---- Main ---- */
+  main { max-width: 1100px; margin: 0 auto; padding: 28px 40px; }
+
+  .section-header {
+    display: flex; align-items: baseline; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .section-title { font-size: 16px; font-weight: 700; }
+  .section-sub { font-size: 12px; color: var(--sub); margin-top: 2px; }
+  .btn-secondary {
+    padding: 6px 14px; border-radius: 6px;
+    border: 1px solid var(--border); background: var(--card);
+    color: var(--text); cursor: pointer; font-size: 12px; font-weight: 500;
+    transition: all 0.15s; font-family: inherit;
+  }
+  .btn-secondary:hover { border-color: #ccc; background: #f8f8f8; }
+
+  /* ---- Video Grid ---- */
+  .video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+  }
+  .video-card {
+    background: var(--card); border-radius: var(--radius);
+    overflow: hidden; cursor: pointer; text-decoration: none; color: inherit;
+    display: block; transition: box-shadow 0.2s;
+    border: 1px solid var(--border);
+  }
+  .video-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  .video-thumb {
+    width: 100%; aspect-ratio: 16/9; background: #e8e8e8;
+    position: relative; overflow: hidden;
+  }
+  .video-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .video-duration {
+    position: absolute; bottom: 5px; right: 6px;
+    background: rgba(0,0,0,0.6); color: #fff;
+    font-size: 11px; padding: 1px 5px; border-radius: 3px;
+  }
+  .video-info { padding: 10px 12px 12px; }
+  .video-title {
+    font-size: 13px; font-weight: 600; line-height: 1.4;
+    display: -webkit-box; -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; overflow: hidden;
+    margin-bottom: 6px; color: var(--text);
+  }
+  .video-meta { font-size: 12px; color: var(--sub); display: flex; gap: 8px; align-items: center; }
+  .up-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100px; }
+
+  /* ---- Course Grid ---- */
+  .course-grid { display: flex; flex-direction: column; gap: 10px; }
+  .course-card {
+    background: var(--card); border-radius: var(--radius);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; gap: 14px; padding: 14px 16px;
+    cursor: pointer; text-decoration: none; color: inherit;
+    transition: box-shadow 0.2s;
+  }
+  .course-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+  .course-thumb {
+    width: 88px; height: 62px; border-radius: 6px;
+    object-fit: cover; background: #e8e8e8; flex-shrink: 0;
+  }
+  .course-info { flex: 1; min-width: 0; }
+  .course-title {
+    font-size: 14px; font-weight: 600; margin-bottom: 6px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .progress-bar { height: 3px; background: #f0f0f0; border-radius: 2px; margin-bottom: 5px; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 0.5s; }
+  .course-meta { font-size: 12px; color: var(--sub); }
+
+  /* ---- States ---- */
+  .state-box {
+    background: var(--card); border-radius: var(--radius);
+    border: 1px solid var(--border); padding: 48px 32px; text-align: center;
+  }
+  .state-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .state-sub { font-size: 13px; color: var(--sub); line-height: 1.5; }
+  .loading-ring {
+    width: 32px; height: 32px; border: 2px solid #e8e8e8;
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin 0.7s linear infinite; margin: 0 auto 14px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .btn-primary {
+    display: inline-block; margin-top: 16px;
+    padding: 9px 24px; background: var(--accent); color: #fff;
+    border: none; border-radius: 6px; font-size: 13px; font-weight: 600;
+    cursor: pointer; text-decoration: none; font-family: inherit;
+  }
+  .btn-primary:hover { opacity: 0.9; }
+
+  /* ---- Tab Panels ---- */
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ---- Finish Banner ---- */
+  .finish-banner {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px 24px;
+    margin-bottom: 20px; display: none;
+    border-left: 3px solid var(--accent);
+  }
+  .finish-banner.show { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .finish-banner-text .title { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .finish-banner-text .sub { font-size: 12px; color: var(--sub); }
+  .finish-banner-actions { display: flex; gap: 8px; flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    哔哩哔哩净化模式
+    <span class="logo-badge">Focus Guard</span>
+  </div>
+  <div class="header-right">
+    <span class="timer" id="timer">00:00</span>
+    <button class="btn-link" onclick="openStats()">今日统计</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab active" id="tab-follow" onclick="switchTab('follow')">关注更新</button>
+  <button class="tab" id="tab-course" onclick="switchTab('course')">我的课程</button>
+</div>
+
+<main>
+  <!-- 关注更新面板 -->
+  <div class="tab-panel active" id="panel-follow">
+    <div class="finish-banner" id="finish-banner">
+      <div class="finish-banner-text">
+        <div class="title">关注内容已看完</div>
+        <div class="sub">没有更多更新了，要去做别的事了吗？</div>
+      </div>
+      <div class="finish-banner-actions">
+        <button class="btn-secondary" onclick="document.getElementById('finish-banner').classList.remove('show')">再看看课程</button>
+        <button class="btn-primary" onclick="window.close(); history.back();" style="margin-top:0; padding: 8px 16px;">离开</button>
+      </div>
+    </div>
+
+    <div class="section-header">
+      <div>
+        <div class="section-title">关注的UP主更新</div>
+        <div class="section-sub">只看你关注的内容，无推荐干扰</div>
+      </div>
+      <button class="btn-secondary" onclick="loadFollowFeed()">刷新</button>
+    </div>
+    <div id="follow-state"></div>
+    <div class="video-grid" id="follow-grid"></div>
+  </div>
+
+  <!-- 我的课程面板 -->
+  <div class="tab-panel" id="panel-course">
+    <div class="section-header">
+      <div>
+        <div class="section-title">我的课程</div>
+        <div class="section-sub">继续学习，保持进度</div>
+      </div>
+      <button class="btn-secondary" onclick="loadCourses()">刷新</button>
+    </div>
+    <div id="course-state"></div>
+    <div class="course-grid" id="course-grid"></div>
+  </div>
+</main>
+
+<script>
+let sessionStart = Date.now();
+
+// ---- 计时器 ----
+setInterval(() => {
+  const s = Math.floor((Date.now() - sessionStart) / 1000);
+  const m = String(Math.floor(s / 60)).padStart(2, '0');
+  const ss = String(s % 60).padStart(2, '0');
+  document.getElementById('timer').textContent = m + ':' + ss;
+}, 1000);
+
+// ---- Tab ----
+function switchTab(tab) {
+  ['follow', 'course'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+    document.getElementById('panel-' + t).classList.toggle('active', t === tab);
+  });
+  if (tab === 'follow') loadFollowFeed();
+  if (tab === 'course') loadCourses();
+}
+
+// ---- B站 API：通过 background service worker 中转请求 ----
+// 扩展独立页面（chrome-extension://...）发跨域请求会被 CORS 拒绝，
+// background 没有此限制，由它代为发出并返回结果。
+function biliGet(url) {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage({ type: 'BILI_API', url }, result => {
+      if (chrome.runtime.lastError) {
+        reject(new Error(chrome.runtime.lastError.message));
+        return;
+      }
+      if (!result) {
+        reject(new Error('无响应，请检查插件是否正常运行'));
+        return;
+      }
+      if (!result.ok) {
+        reject(new Error(result.error || '请求失败'));
+        return;
+      }
+      resolve(result.data);
+    });
+  });
+}
+
+// ---- 状态组件 ----
+function showLoading(containerId, text = '加载中...') {
+  document.getElementById(containerId).innerHTML = `
+    <div class="state-box">
+      <div class="loading-ring"></div>
+      <div class="state-sub">${text}</div>
+    </div>`;
+}
+
+function showEmpty(containerId, title, sub = '') {
+  document.getElementById(containerId).innerHTML = `
+    <div class="state-box">
+      <div class="state-title">${title}</div>
+      ${sub ? `<div class="state-sub">${sub}</div>` : ''}
+    </div>`;
+}
+
+function showLogin(containerId) {
+  document.getElementById(containerId).innerHTML = `
+    <div class="state-box">
+      <div class="state-title">需要登录 B站</div>
+      <div class="state-sub">请先在 B站 完成登录，再回到这个页面</div>
+      <a class="btn-primary" href="https://www.bilibili.com" target="_blank">去 B站 登录</a>
+    </div>`;
+}
+
+function showError(containerId, msg, retryFn) {
+  document.getElementById(containerId).innerHTML = `
+    <div class="state-box">
+      <div class="state-title">加载失败</div>
+      <div class="state-sub">${msg}</div>
+      <button class="btn-primary" onclick="(${retryFn.toString()})()" style="margin-top:14px; padding:8px 20px;">重试</button>
+    </div>`;
+}
+
+// ---- 关注更新 ----
+// 使用动态列表 API（type=8 是视频投稿）
+async function loadFollowFeed() {
+  const grid = document.getElementById('follow-grid');
+  grid.innerHTML = '';
+  showLoading('follow-state', '加载关注内容...');
+
+  try {
+    // 动态列表接口（关注的人的更新）
+    const data = await biliGet(
+      'https://api.bilibili.com/x/polymer/web-dynamic/v1/feed/all?timezone_offset=-480&type=video&page=1'
+    );
+
+    document.getElementById('follow-state').innerHTML = '';
+
+    const items = data?.items || [];
+    if (!items.length) {
+      document.getElementById('finish-banner').classList.add('show');
+      showEmpty('follow-state', '关注内容已看完', '你跟上了所有UP主的更新');
+      return;
+    }
+
+    items.forEach(item => {
+      const modules = item.modules || {};
+      const author = modules.module_author || {};
+      const dynamic = modules.module_dynamic || {};
+      const major = dynamic.major || {};
+
+      // 视频类型
+      const archive = major.archive || major.pgc || {};
+      if (!archive.bvid && !archive.aid) return;
+
+      const card = document.createElement('a');
+      card.className = 'video-card';
+      card.href = 'https://www.bilibili.com/video/' + (archive.bvid || 'av' + archive.aid);
+      card.target = '_blank';
+
+      const cover = (archive.cover || '').replace(/^http:/, 'https:');
+      const title = archive.title || '未知标题';
+      const upName = author.name || '';
+      const duration = archive.duration_text || '';
+      const stat = archive.stat || {};
+      const plays = formatNum(stat.play || 0);
+
+      card.innerHTML = `
+        <div class="video-thumb">
+          <img src="${cover}@320w_200h_1c.webp" alt="" loading="lazy" onerror="this.src='${cover}'" />
+          ${duration ? `<span class="video-duration">${duration}</span>` : ''}
+        </div>
+        <div class="video-info">
+          <div class="video-title">${escHtml(title)}</div>
+          <div class="video-meta">
+            <span class="up-name">${escHtml(upName)}</span>
+            ${plays ? `<span>·</span><span>${plays}播放</span>` : ''}
+          </div>
+        </div>`;
+      grid.appendChild(card);
+    });
+
+    if (!grid.children.length) {
+      document.getElementById('finish-banner').classList.add('show');
+      showEmpty('follow-state', '暂无视频动态', '关注的UP主最近没有视频更新');
+    }
+
+  } catch (e) {
+    console.error('Follow feed error:', e);
+    if (e.message === 'NOT_LOGIN') {
+      showLogin('follow-state');
+    } else {
+      showError('follow-state', e.message, loadFollowFeed);
+    }
+  }
+}
+
+// ---- 我的课程 ----
+async function loadCourses() {
+  const grid = document.getElementById('course-grid');
+  grid.innerHTML = '';
+  showLoading('course-state', '加载课程...');
+
+  try {
+    // 课程购买列表接口
+    const data = await biliGet(
+      'https://api.bilibili.com/pugv/app/web/season/user/buy?pn=1&ps=20'
+    );
+
+    document.getElementById('course-state').innerHTML = '';
+
+    const items = data?.items || [];
+    if (!items.length) {
+      showEmpty('course-state', '暂无购买的课程', '可以去 B站 课程频道看看');
+      return;
+    }
+
+    items.forEach(c => {
+      const card = document.createElement('a');
+      card.className = 'course-card';
+      const ssid = c.season_id;
+      card.href = ssid
+        ? 'https://www.bilibili.com/cheese/play/ss' + ssid
+        : 'https://www.bilibili.com/cheese/';
+      card.target = '_blank';
+
+      const cover = (c.cover || '').replace(/^http:/, 'https:');
+      const title = c.title || '未知课程';
+      const progress = c.progress || 0; // 0-100
+      const epCount = c.ep_count || 0;
+      const watchedEp = c.watched_ep_count || 0;
+
+      card.innerHTML = `
+        <img class="course-thumb" src="${cover}@176w_124h_1c.webp" alt=""
+          onerror="this.src='${cover}'" />
+        <div class="course-info">
+          <div class="course-title">${escHtml(title)}</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${progress}%"></div>
+          </div>
+          <div class="course-meta">
+            ${watchedEp && epCount ? `${watchedEp}/${epCount}集 · ` : ''}进度 ${progress}%
+          </div>
+        </div>`;
+      grid.appendChild(card);
+    });
+
+  } catch (e) {
+    console.error('Course error:', e);
+    if (e.message === 'NOT_LOGIN') {
+      showLogin('course-state');
+    } else {
+      showError('course-state', e.message, loadCourses);
+    }
+  }
+}
+
+// ---- 工具 ----
+function formatNum(n) {
+  if (n >= 10000) return (n / 10000).toFixed(1) + '万';
+  return n > 0 ? String(n) : '';
+}
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function openStats() {
+  chrome.tabs.create({ url: chrome.runtime.getURL('src/pages/stats.html') });
+}
+
+// Init
+loadFollowFeed();
+</script>
+</body>
+</html>

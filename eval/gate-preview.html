@@ -1,0 +1,83 @@
+<!doctype html>
+<!-- 只用于核对入口闸门的实现和设计稿是否一致，不随插件打包 -->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>入口闸门 · 实现预览</title>
+<style>
+  html, body { margin: 0; height: 100%; font-family: -apple-system, "PingFang SC", sans-serif; }
+  /* 假的小红书骨架：左导航 167px，右边是内容层 */
+  .nav {
+    position: fixed; left: 0; top: 0; bottom: 0; width: 167px;
+    border-right: 1px solid #f0f0f0; padding: 20px 16px; box-sizing: border-box;
+  }
+  .logo { width: 62px; height: 26px; border-radius: 6px; background: #ff2442; margin-bottom: 24px; }
+  .nav i { display: block; height: 22px; margin: 18px 0; border-radius: 6px; background: #eee; }
+  .content { margin-left: 167px; padding: 24px; }
+  .tabs { display: flex; gap: 22px; margin: 44px 0 20px; }
+  .tabs b { height: 14px; width: 40px; border-radius: 4px; background: #eee; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .cell { height: 190px; border-radius: 10px; background: #e8e8e8; }
+  .cell:nth-child(2n) { height: 230px; background: #dedede; }
+  /* 核对几何时不要量到过渡中间值 */
+  .fg-gate, .fg-gate-card, .fg-gate-go, .fg-gate-browse, .fg-gate-clear { transition: none !important; }
+  #M { position: fixed; left: 8px; bottom: 8px; margin: 0; font-size: 10px; color: #666; }
+</style>
+</head>
+<body>
+  <div class="nav">
+    <div class="logo"></div>
+    <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+  </div>
+  <div class="content">
+    <div class="tabs"><b></b><b></b><b></b><b></b><b></b><b></b></div>
+    <div class="grid">
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+      <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+    </div>
+  </div>
+
+<script>
+  // 预览环境里假冒扩展 API，让 getURL 解析成相对路径
+  window.chrome = { runtime: { getURL: (p) => '../' + p } };
+</script>
+<script src="../src/content/xhs-ui.js"></script>
+<script>
+  const state = new URLSearchParams(location.search).get('state') || 'default';
+  window.__fgUI.showGate({
+    defaultKeyword: state === 'filled' ? '吃什么' : '',
+    onSearch: (kw) => console.log('search', kw),
+    onBrowse: (kw) => console.log('browse', kw)
+  });
+  // 截图时不要停在过渡中间
+  const gate = document.getElementById('fg-xhs-gate');
+  gate.classList.add('on');
+
+  // 把实测尺寸打出来，用来和设计稿逐项对
+  const pre = document.createElement('pre');
+  pre.id = 'M';
+  setTimeout(() => {
+    const r = (el) => { const b = el.getBoundingClientRect(); return Math.round(b.width) + 'x' + Math.round(b.height) + ' @' + Math.round(b.left) + ',' + Math.round(b.top); };
+    const card = document.getElementById('fg-gate-card');
+    const cs = getComputedStyle(card);
+    pre.textContent = 'MEAS_BEGIN\n' + [
+      'mask_left: ' + gate.style.left,
+      'card: ' + r(card),
+      'card_radius: ' + cs.borderRadius + ' pad: ' + cs.padding + ' gap: ' + cs.gap,
+      'card_center_x_pct: ' + (100 * (card.getBoundingClientRect().left + card.offsetWidth / 2) / window.innerWidth).toFixed(1),
+      'card_center_y_pct: ' + (100 * (card.getBoundingClientRect().top + card.offsetHeight / 2) / window.innerHeight).toFixed(1),
+      'hand: ' + r(document.querySelector('.fg-gate-hand')),
+      'field: ' + r(document.querySelector('.fg-gate-field')),
+      'go: ' + r(document.getElementById('fg-gate-go')),
+      'browse: ' + r(document.getElementById('fg-gate-browse')),
+      'clear_opacity: ' + getComputedStyle(document.getElementById('fg-gate-clear')).opacity,
+      'title_pad_left: ' + getComputedStyle(document.querySelector('.fg-gate-title')).paddingLeft,
+      'gate_class: ' + gate.className,
+      'card_class: ' + card.className,
+      'card_transform: ' + cs.transform
+    ].join('\n') + '\nMEAS_END';
+    document.body.appendChild(pre);
+  }, 600);
+</script>
+</body>
+</html>
