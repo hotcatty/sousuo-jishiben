@@ -44,11 +44,3 @@ bash scripts/pack.sh
 
 侧栏走 Chrome Side Panel：点工具栏图标打开。
 
-## 版本更新后怎么继续测
-
-每次发新版本：
-
-1. 从 [最新 Release](https://github.com/hotcatty/sousuo-jishiben/releases/latest) 下载新的 zip（或 `git pull` 后重新 `bash scripts/pack.sh`，也可以直接加载仓库根目录）。
-2. 解压覆盖原来的文件夹；若解压到了新目录，在扩展卡片上移除旧扩展，再重新「加载已解压」。
-3. 打开 `chrome://extensions`，找到「搜搜记事本」，点卡片上的 **刷新 / Reload**。
-4. 再刷新小红书页面。只刷网页不够，扩展脚本不会自动换成新版本。
