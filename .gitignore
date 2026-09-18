@@ -5,3 +5,4 @@
 *.crx
 node_modules/
 .thumbs/
+dist/
